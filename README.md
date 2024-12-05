@@ -2,15 +2,6 @@
 
 This project demonstrates how to preprocess data using **StandardScaler** for feature standardization and **Principal Component Analysis (PCA)** for dimensionality reduction. A **Decision Tree Classifier** is trained and evaluated to explore the impact of different PCA configurations on classification accuracy.  
 
----
-
-## 📋 Table of Contents  
-1. [Project Overview](#project-overview)  
-2. [Dataset Requirements](#dataset-requirements)  
-3. [Methodology](#methodology)  
-4. [Dependencies](#dependencies)  
-5. [Steps to Use](#steps-to-use)  
-6. [Results](#results)  
 
 ---
 
@@ -58,3 +49,53 @@ Install the required libraries before running the code:
 
 ```bash
 pip install pandas numpy scikit-learn
+
+```
+
+
+## 🚀 Steps to Use
+Load your dataset and split it into:
+
+ - X_train (training data)
+ - X_test (testing data)
+ - y_train (training labels)
+ - y_test (testing labels)
+---
+Copy and paste the following code into a Jupyter Notebook or Python script to preprocess the data, apply PCA, and evaluate the Decision Tree Classifier:
+
+```bash
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# Scale the data
+scale = StandardScaler()
+clf3 = ColumnTransformer(
+    transformers=[('scale', scale, X_train.columns)],
+    remainder='passthrough'
+)
+x_train_scaled = clf3.fit_transform(X_train)
+x_test_scaled = clf3.transform(X_test)
+
+# Convert scaled data to DataFrame
+x_train_scaled = pd.DataFrame(x_train_scaled, columns=X_train.columns)
+x_test_scaled = pd.DataFrame(x_test_scaled, columns=X_test.columns)
+
+# Train and evaluate with PCA
+dtc = DecisionTreeClassifier(random_state=42)
+for i in range(1, len(X_train.columns) + 1):
+    pca = PCA(n_components=i, random_state=42)
+    x_train_pca = pca.fit_transform(x_train_scaled)
+    x_test_pca = pca.transform(x_test_scaled)
+    dtc.fit(x_train_pca, y_train)
+    y_pred = dtc.predict(x_test_pca)
+    print(f'Decision Tree Classifier with {i} PCA components: Accuracy = {accuracy_score(y_test, y_pred):.4f}')
+```
+---
+
+## Results
+Decision Tree Classifier with 1 PCA components: Accuracy = 0.03 Decision Tree Classifier with 2 PCA components: 
+Accuracy = 0.06 ... Decision Tree Classifier with 16 PCA components: Accuracy = 0.09
